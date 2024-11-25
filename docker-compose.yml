@@ -9,6 +9,8 @@ services:
     depends_on:
       - sqldata
       - catalog-api
+      - identity-api
+      - audit-api
 
   catalog-api:
     image: regtansfers/rtcodingexercise-catalogapi
@@ -33,6 +35,7 @@ services:
       dockerfile: src/Services/Audit/Audit.API/Dockerfile
     depends_on:
       - sqldata
+
 
   sqldata:
     image: mcr.microsoft.com/mssql/server:2019-latest

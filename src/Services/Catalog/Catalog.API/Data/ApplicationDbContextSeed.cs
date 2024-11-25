@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 
 namespace Catalog.API.Data
 {
@@ -54,7 +54,7 @@ namespace Catalog.API.Data
             string filePath = Path.Combine(contentRootPath, "Setup", "plates.json");
             string json = File.ReadAllText(filePath);
 
-            var plates = JsonConvert.DeserializeObject<List<Plate>>(json) ?? new List<Plate>();
+            var plates = JsonSerializer.Deserialize<List<Plate>>(json) ?? new List<Plate>();
 
             return plates;
         }

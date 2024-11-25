@@ -4,16 +4,26 @@ using Contracts.Plates.Events;
 using DomainEvents.Plates;
 using System.ComponentModel.DataAnnotations.Schema;
 using Catalog.Domain.ValueObjects;
+using System.Text.Json.Serialization;
 
 namespace Catalog.Domain
 {
     public class Plate : EntityBase
     {
+        [JsonInclude]
         public Guid Id { get; private set; }
+        [JsonInclude]
         public string Registration { get; private set; }
+        [JsonInclude]
+        [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
         public decimal PurchasePrice { get; private set; }
+        [JsonInclude]
+        [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
         public decimal SalePrice { get; private set; }
+        [JsonInclude]
         public string Letters { get; private set; }
+        [JsonInclude]
+        [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
         public int Numbers { get; private set; }
         public PlateStatus Status { get; private set; }
         public int StatusId { get; private set; }
