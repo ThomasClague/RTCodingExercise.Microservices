@@ -2,31 +2,7 @@
 
 ## Architecture Overview
 
-flowchart TB
-    subgraph RabbitMQ
-        mq{{RabbitMQ}}:::message-queue
-    end
-
-    subgraph SharedDB
-        db[(Shared Database)]:::db
-    end
-
-    WebProject:::service -- calls --> IdentityMicroservice:::service
-    WebProject:::service -- sends messages --> mq{{RabbitMQ}}:::message-queue
-
-    mq{{RabbitMQ}}:::message-queue -- delivers requests --> AuditMicroservice:::service
-    mq{{RabbitMQ}}:::message-queue -- delivers requests --> CatalogMicroservice:::service
-
-    AuditMicroservice:::service -- responds via --> mq{{RabbitMQ}}:::message-queue
-    CatalogMicroservice:::service -- responds via --> mq{{RabbitMQ}}:::message-queue
-
-    AuditMicroservice:::service -- uses --> db[(Shared Database)]:::db
-    CatalogMicroservice:::service -- uses --> db[(Shared Database)]:::db
-    IdentityMicroservice:::service -- uses --> db[(Shared Database)]:::db
-
-    classDef service fill:#4994eb, color:#ffffff;
-    classDef message-queue fill:#36c97d, color:#191919;
-    classDef db fill:#fad505, color:#191919;
+[![](https://mermaid.ink/img/pako:eNqdlE1LAzEQhv9KiBeFFhRbpREEay8eCmoFQdfDJJltI9lNm49KKf3vZs3WYovb0uwlO_u-z0xmhyypMBIpo7k2X2IC1pOXflaSuFzgYwvTCXkGzpUfPqVwtYrZcrmOrlaMsQKdgzG2ZwEDJh2WMiu3SKOYAOWgvyFJ_n6aomQAHjg4PPuIQMl3KK_IH635ROHjd4d2rgSSdpsI0NrFzS15kFh65RdDJaypFRttM8XFTI7U50i4fadMwGZVhZao1RytIxZjzPlEvwsyWhoqPRZ8H_uozfg_dII3ZK_IFt3UVA2ZKzioFxWzMfFR1INqDa7-X_tmaW99B5OaB-1gVIIJDc4NMCdre660ZiedXq-DvEWE0cayk_xn3WxZ_o5EMl5eid61_DVe9Kpn2yh5rc5Bds-7u2raogXaApSMl8OycmfUT7DAjLK4lZhD0D6jWbmKUgjejBaloMzbgC1qTRhPKMtBu_gWphI8DhTEW6BYS6ZQvhlT1KLVN4BXiVY?type=png)](https://mermaid.live/edit#pako:eNqdlE1LAzEQhv9KiBeFFhRbpREEay8eCmoFQdfDJJltI9lNm49KKf3vZs3WYovb0uwlO_u-z0xmhyypMBIpo7k2X2IC1pOXflaSuFzgYwvTCXkGzpUfPqVwtYrZcrmOrlaMsQKdgzG2ZwEDJh2WMiu3SKOYAOWgvyFJ_n6aomQAHjg4PPuIQMl3KK_IH635ROHjd4d2rgSSdpsI0NrFzS15kFh65RdDJaypFRttM8XFTI7U50i4fadMwGZVhZao1RytIxZjzPlEvwsyWhoqPRZ8H_uozfg_dII3ZK_IFt3UVA2ZKzioFxWzMfFR1INqDa7-X_tmaW99B5OaB-1gVIIJDc4NMCdre660ZiedXq-DvEWE0cayk_xn3WxZ_o5EMl5eid61_DVe9Kpn2yh5rc5Bds-7u2raogXaApSMl8OycmfUT7DAjLK4lZhD0D6jWbmKUgjejBaloMzbgC1qTRhPKMtBu_gWphI8DhTEW6BYS6ZQvhlT1KLVN4BXiVY)
 
 ## Test Users Details
 Admin User: (Gives access to add a plate, purchase prices and reservation function)
@@ -259,7 +235,6 @@ I made the decision to implement an Identity microservice so that we could have 
   - FluentAssertions for readable assertions
 
 ![Screenshot: Test Explorer showing 81 passing tests](Images/UnitTests.png)
-
 
 
 ## Thoughts and Future Improvements
