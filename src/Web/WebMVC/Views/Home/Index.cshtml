@@ -41,10 +41,9 @@
                        placeholder="Discount code">
             }
             <input type="text" 
-                   name="PlatesFilter.SearchTerm" 
+                   asp-for="@Model.PlatesFilter.SearchTerm"
                    class="form-control" 
-                   placeholder="Search plates..." 
-                   value="@Model.PlatesFilter.SearchTerm">
+                   placeholder="Search plates...">
             <select name="PlatesFilter.SortBy" class="form-select" style="width: 250px;">
                 <option value="">Order by</option>
                 @foreach (var option in sortOptions)
