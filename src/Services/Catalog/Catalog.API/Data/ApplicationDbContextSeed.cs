@@ -30,6 +30,13 @@ namespace Catalog.API.Data
         {
             try
             {
+                var dataExists = await context.Plates.AnyAsync();
+                if (dataExists)
+                {
+                    logger.LogWarning("Data has already been seeded");
+                    return;
+                }
+
                 var plates = ReadApplicationRoleFromJson(env.ContentRootPath, logger);
 
                 await context.Plates.AddRangeAsync(plates);

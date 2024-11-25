@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
+﻿using Catalog.API.Contracts.Data;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Catalog.API.Data
 {
@@ -13,10 +14,9 @@ namespace Catalog.API.Data
                .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-
             optionsBuilder.UseSqlServer(config["ConnectionString"], sqlServerOptionsAction: o => o.MigrationsAssembly("Catalog.API"));
 
-            return new ApplicationDbContext(optionsBuilder.Options);
+            return new ApplicationDbContext(optionsBuilder.Options, null);
         }
     }
 }

@@ -1,0 +1,52 @@
+﻿@using WebMVC.Models
+@model CreatePlateViewModel
+
+<div class="container">
+    <h1 class="mb-4">Add New Plate</h1>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (Model.Errors.Any())
+    {
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach (var error in Model.Errors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <form asp-action="AddPlate" method="post">
+        <div class="form-group mb-3">
+            <label asp-for="Registration"></label>
+            <input asp-for="Registration" class="form-control" />
+            <span asp-validation-for="Registration" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="PurchasePrice"></label>
+            <input asp-for="PurchasePrice" class="form-control" />
+            <span asp-validation-for="PurchasePrice" type="number" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="SalePrice"></label>
+            <input asp-for="SalePrice" class="form-control" />
+            <span asp-validation-for="SalePrice" type="number" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Plate</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+} 

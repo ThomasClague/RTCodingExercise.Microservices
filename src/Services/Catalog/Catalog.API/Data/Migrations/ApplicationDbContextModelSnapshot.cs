@@ -29,6 +29,7 @@ namespace Catalog.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Letters")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Numbers")
@@ -38,14 +39,67 @@ namespace Catalog.API.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Registration")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("SalePrice")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("StatusId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.HasKey("Id");
 
+                    b.HasIndex("StatusId");
+
                     b.ToTable("Plates");
+                });
+
+            modelBuilder.Entity("Catalog.Domain.PlateStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlateStatus");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Plate is available for purchase"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Plate is temporarily reserved"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Plate has been sold"
+                        });
+                });
+
+            modelBuilder.Entity("Catalog.Domain.Plate", b =>
+                {
+                    b.HasOne("Catalog.Domain.PlateStatus", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Status");
                 });
 #pragma warning restore 612, 618
         }

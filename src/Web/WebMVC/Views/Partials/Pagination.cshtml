@@ -1,0 +1,101 @@
+﻿@using Contracts.Pagination
+
+@model Pagination
+
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        @if (Model.HasPrevious)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?Page=@(Model.Page - 1)&PageSize=@Model.PageSize" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+        }
+
+        @{
+            int currentPage = Model.Page;
+            int totalPages = Model.TotalPages;
+            int maxPagesToShow = 7;
+            int startPage = Math.Max(1, currentPage - 3);
+            int endPage = Math.Min(totalPages, currentPage + 3);
+
+            // Ensure we show exactly `maxPagesToShow` pages if possible
+            if (endPage - startPage < maxPagesToShow - 1)
+            {
+                if (startPage == 1)
+                {
+                    endPage = Math.Min(totalPages, startPage + maxPagesToShow - 1);
+                }
+                else if (endPage == totalPages)
+                {
+                    startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+                }
+            }
+        }
+
+        @if (startPage > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?Page=1&PageSize=@Model.PageSize">1</a>
+            </li>
+            @if (startPage > 2)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            }
+        }
+
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            if (i == currentPage)
+            {
+                <li class="page-item active">
+                    <span class="page-link">@i</span>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?Page=@i&PageSize=@Model.PageSize">@i</a>
+                </li>
+            }
+        }
+
+        @if (endPage < totalPages)
+        {
+            @if (endPage < totalPages - 1)
+            {
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            }
+            <li class="page-item">
+                <a class="page-link" href="?Page=@totalPages&PageSize=@Model.PageSize">@totalPages</a>
+            </li>
+        }
+
+        @if (Model.HasNext)
+        {
+            <li class="page-item">
+                <a class="page-link" href="?Page=@(Model.Page + 1)&PageSize=@Model.PageSize" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+        }
+    </ul>
+</nav>
+

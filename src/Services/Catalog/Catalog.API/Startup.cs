@@ -1,4 +1,8 @@
-﻿using MassTransit;
+﻿using Catalog.API.Consumers;
+using Catalog.API.Contracts.Data;
+using Catalog.API.Contracts.Services;
+using Catalog.API.Services;
+using MassTransit;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 
@@ -16,6 +20,10 @@ namespace Catalog.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IDomainEventDispatcher, MassTransitDomainEventDispatcher>();
+            services.AddScoped(typeof(ICatalogRepository<>), typeof(CatalogRepository<>));
+            services.AddScoped<IPlatesService, PlatesService>();
+
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(Configuration["ConnectionString"],
@@ -52,7 +60,11 @@ namespace Catalog.API
 
             services.AddMassTransit(x =>
             {
-                //x.AddConsumer<ConsumerClass>();
+                x.AddConsumer<GetPlatesConsumer>();
+                x.AddConsumer<CreatePlateConsumer>();
+                x.AddConsumer<ReservePlateConsumer>();
+                x.AddConsumer<BuyPlateConsumer>();
+                x.AddConsumer<GetAverageProfitMarginConsumer>();
 
                 //ADD CONSUMERS HERE
                 x.UsingRabbitMq((context, cfg) =>
@@ -101,7 +113,7 @@ namespace Catalog.API
             // Make work identity server redirections in Edge and lastest versions of browers. WARN: Not valid in a production environment.
             app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("Content-Security-Policy", "script-src 'unsafe-inline'");
+                context.Response.Headers.Add("Content-Security-Policy", "script-src 'unsafe-inline' 'self'");
                 await next();
             });
 

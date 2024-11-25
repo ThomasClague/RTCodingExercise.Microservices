@@ -18,6 +18,22 @@ services:
     depends_on:
       - sqldata
 
+  identity-api:
+    image: regtansfers/rtcodingexercise-identityapi
+    build:
+      context: .
+      dockerfile: src/Services/Identity/Identity.API/Dockerfile
+    depends_on:
+      - sqldata
+
+  audit-api:
+    image: regtansfers/rtcodingexercise-auditapi
+    build:
+      context: .
+      dockerfile: src/Services/Audit/Audit.API/Dockerfile
+    depends_on:
+      - sqldata
+
   sqldata:
     image: mcr.microsoft.com/mssql/server:2019-latest
 

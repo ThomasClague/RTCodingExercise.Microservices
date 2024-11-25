@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - RTCodingExercise.Microservices</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/RTCodingExercise.Microservices.styles.css" asp-append-version="true" />
+</head>
+<body>
+
+    <div class="container-fluid min-vh-100 d-flex flex-column justify-content-center align-items-center">
+
+        <main role="main" class="flex-grow-1 w-100">
+            @RenderBody()
+        </main>
+
+        <footer class="mt-5 text-center">
+            <p>&copy; 2024 My Application. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

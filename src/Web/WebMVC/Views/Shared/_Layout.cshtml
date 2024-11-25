@@ -1,4 +1,30 @@
-﻿<!DOCTYPE html>
+﻿@using WebMVC.Infrastructure.Extensions
+@using Contracts.Constants
+@inject WebMVC.Services.IAuditService AuditService
+@inject WebMVC.Services.ICatalogService CatalogService
+@{
+    var totalRevenue = new decimal(0);
+    if (User.IsInRole(Roles.Admin))
+    {
+        var result = await AuditService.GetTotalRevenueAsync();
+        if (result.IsSuccess)
+        {
+            totalRevenue = result.Value;
+        }
+    }
+
+    var averageProfitMargin = new decimal(0);
+    if (User.IsInRole(Roles.Admin))
+    {
+        var profitResult = await CatalogService.GetAverageProfitMarginAsync();
+        if (profitResult.IsSuccess)
+        {
+            averageProfitMargin = profitResult.Value;
+        }
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -11,25 +37,77 @@
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">RTCodingExercise.Microservices</a>
+            <div class="container">
+                <!-- Changed container-fluid to container -->
+                <a class="navbar-brand me-5" asp-area="" asp-controller="Home" asp-action="Index">RTCodingExercise.Microservices</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-center">
+                    <div class="d-flex justify-content-between w-100">
+                        <!-- Left-aligned nav items -->
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                        </ul>
+
+                        <!-- Center-aligned metrics -->
+                        @if (User.IsInRole(Roles.Admin))
+                        {
+                            <ul class="navbar-nav mx-auto">
+                                <li class="nav-item me-3">
+                                    <span class="nav-link">
+                                        <span class="badge bg-info text-dark">
+                                            Total Revenue: £@String.Format("{0:N0}", totalRevenue)
+                                        </span>
+                                    </span>
+                                </li>
+                                <li class="nav-item">
+                                    <span class="nav-link">
+                                        <span class="badge bg-warning text-dark">
+                                            Average Profit Margin: @averageProfitMargin.ToString("F2")%
+                                        </span>
+                                    </span>
+                                </li>
+                            </ul>
+                        }
+
+                        <!-- Right-aligned nav items -->
+                        <ul class="navbar-nav">
+                            @if (User.Identity != null && User.Identity.IsAuthenticated)
+                            {
+                                @if (User.IsAdmin())
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="admin" asp-action="addplate">Add Plate</a>
+                                    </li>
+                                }
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
+
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -44,6 +122,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
+        @await RenderSectionAsync("Scripts", required: false)
+    </body>
 </html>
+

@@ -1,10 +1,143 @@
-﻿@model List<Catalog.Domain.Plate>
+﻿@using Contracts.Constants
+@using WebMVC.Infrastructure.Extensions
+@using WebMVC.Models
+@model WebMVC.Models.PlatesViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Plate Selection";
+
+    var sortOptions = new List<SelectListItem>
+    {
+        new SelectListItem("Sale Price (Low to High)", "salePrice:asc"),
+        new SelectListItem("Sale Price (High to Low)", "salePrice:desc")
+    };
+
+    @if (User.IsInRole(Roles.Admin)) {
+        sortOptions.AddRange(new List<SelectListItem>() {
+            new SelectListItem("Purchase Price (Low to High)", "purchasePrice:asc"),
+            new SelectListItem("Purchase Price (High to Low)", "purchasePrice:desc")
+        });
+    }
+
+    var selectedValue = $"{Model?.PlatesFilter?.SortBy}:{Model?.PlatesFilter?.OrderBy}";
+    var matchingSelectItem = sortOptions.FirstOrDefault(x => x.Value == selectedValue);
+    if (matchingSelectItem is not null)
+    {
+        matchingSelectItem.Selected = true;
+    }
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    @await Html.PartialAsync("~/Views/Partials/_Alerts.cshtml")
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Available Number Plates</h1>
+        <form asp-action="Index" asp-controller="Home" class="d-flex gap-3">
+            @if (User.IsInRole(Roles.User))
+            {
+                <input type="text"
+                       asp-for="@Model.PlatesFilter.DiscountCode"
+                       class="form-control" 
+                       placeholder="Discount code">
+            }
+            <input type="text" 
+                   name="PlatesFilter.SearchTerm" 
+                   class="form-control" 
+                   placeholder="Search plates..." 
+                   value="@Model.PlatesFilter.SearchTerm">
+            <select name="PlatesFilter.SortBy" class="form-select" style="width: 250px;">
+                <option value="">Order by</option>
+                @foreach (var option in sortOptions)
+                {
+                    <option value="@option.Value" selected="@option.Selected">@option.Text</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+    </div>
+
+    <div class="row mt-4">
+        @if (Model?.PagedResponse?.Data == null || !Model.PagedResponse.Data.Any())
+        {
+            <div class="col-12">
+                <p class="text-center text-muted">No plates found matching your criteria.</p>
+            </div>
+        }
+
+        else
+        {
+            @foreach (var plate in Model.PagedResponse.Data)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card position-relative @(plate.StatusId == (int)PlateStatusEnum.Reserved ? "bg-light opacity-75" : "")">
+                        <div class="card-header text-center">
+                            <h4 class="card-title mb-0">@plate.Registration</h4>
+                        </div>
+                        <div class="card-body text-center @(plate.StatusId == (int)PlateStatusEnum.Reserved ? "text-muted" : "")">
+                            @if (plate.StatusId == (int)PlateStatusEnum.Reserved)
+                            {
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-warning text-dark">Reserved</span>
+                                </div>
+                            }
+                            @if (plate.StatusId == (int)PlateStatusEnum.Sold)
+                            {
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge bg-danger">Sold</span>
+                                </div>
+                            }
+                            <p class="h5">Sale Price: £@String.Format("{0:N0}", plate.DisplayPrice)</p>
+                            @if (User.IsInRole(Roles.Admin))
+                            {
+                                <p class="text-muted">Purchase Price: £@String.Format("{0:N0}", plate.PurchasePrice)</p>
+                                @if (plate.StatusId == (int)PlateStatusEnum.Available)
+                                {
+                                    <form asp-action="ReservePlate" asp-controller="Home" method="post">
+                                        <input type="hidden" name="plateId" value="@plate.Id" />
+                                        <input type="hidden" name="PlatesFilter.SearchTerm" value="@Model.PlatesFilter.SearchTerm" />
+                                        <input type="hidden" name="PlatesFilter.SortBy" value="@Model.PlatesFilter.SortBy" />
+                                        <input type="hidden" name="PlatesFilter.OrderBy" value="@Model.PlatesFilter.OrderBy" />
+                                        <input type="hidden" name="PlatesFilter.Page" value="@Model.PlatesFilter.Page" />
+                                        <input type="hidden" name="PlatesFilter.PageSize" value="@Model.PlatesFilter.PageSize" />
+                                        <button type="submit" class="btn btn-warning">
+                                            Reserve Plate
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-warning" disabled>
+                                        Reserved
+                                    </button>
+                                }
+                            }
+                            @if (User.IsInRole(Roles.User) && plate.StatusId == (int)PlateStatusEnum.Available)
+                            {
+                                <button type="button" class="btn btn-success" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#buyPlateModal"
+                                        data-plate-id="@plate.Id"
+                                        data-plate-registration="@plate.Registration"
+                                        data-plate-price="@String.Format("{0:N0}", plate.DisplayPrice)"
+                                        data-discount-code="@Model.PlatesFilter.DiscountCode"
+                                        data-search-term="@Model.PlatesFilter.SearchTerm"
+                                        data-sort-by="@Model.PlatesFilter.SortBy"
+                                        data-order-by="@Model.PlatesFilter.OrderBy"
+                                        data-page="@Model.PlatesFilter.Page"
+                                        data-page-size="@Model.PlatesFilter.PageSize">
+                                    Buy Plate
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+
+        @if (Model?.PagedResponse?.Pagination != null) {
+            @await Html.PartialAsync("~/Views/Partials/Pagination.cshtml", Model?.PagedResponse.Pagination);
+        }
+    </div>
 </div>
+
+@await Html.PartialAsync("~/Views/Partials/_BuyPlateModal.cshtml")

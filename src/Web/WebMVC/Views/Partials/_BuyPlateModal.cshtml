@@ -1,0 +1,57 @@
+<div class="modal fade" id="buyPlateModal" tabindex="-1" aria-labelledby="buyPlateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="buyPlateModalLabel">Confirm Purchase</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Are you sure you want to buy plate <span id="plateRegistration"></span> for £<span id="platePrice"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form asp-action="BuyPlate" asp-controller="Home" method="post" class="d-inline">
+                    <input type="hidden" name="plateId" id="plateIdInput" />
+                    <input type="hidden" name="PlatesFilter.SearchTerm" id="searchTermInput" />
+                    <input type="hidden" name="PlatesFilter.SortBy" id="sortByInput" />
+                    <input type="hidden" name="PlatesFilter.OrderBy" id="orderByInput" />
+                    <input type="hidden" name="PlatesFilter.Page" id="pageInput" />
+                    <input type="hidden" name="PlatesFilter.PageSize" id="pageSizeInput" />
+                    <input type="hidden" name="PlatesFilter.DiscountCode" id="discountCodeInput" />
+                    <button type="submit" class="btn btn-success">Confirm Purchase</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initBuyPlateModal() {
+        var buyPlateModal = document.getElementById('buyPlateModal')
+        buyPlateModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget
+            var plateId = button.getAttribute('data-plate-id')
+            var plateRegistration = button.getAttribute('data-plate-registration')
+            var platePrice = button.getAttribute('data-plate-price')
+            var searchTerm = button.getAttribute('data-search-term')
+            var sortBy = button.getAttribute('data-sort-by')
+            var orderBy = button.getAttribute('data-order-by')
+            var page = button.getAttribute('data-page')
+            var pageSize = button.getAttribute('data-page-size')
+            var discountCode = button.getAttribute('data-discount-code')
+
+            document.getElementById('plateIdInput').value = plateId
+            document.getElementById('plateRegistration').textContent = plateRegistration
+            document.getElementById('platePrice').textContent = platePrice
+            document.getElementById('searchTermInput').value = searchTerm
+            document.getElementById('sortByInput').value = sortBy
+            document.getElementById('orderByInput').value = orderBy
+            document.getElementById('pageInput').value = page
+            document.getElementById('pageSizeInput').value = pageSize
+            document.getElementById('discountCodeInput').value = discountCode
+        })
+    }
+
+    // Initialize when document is ready
+    document.addEventListener('DOMContentLoaded', initBuyPlateModal)
+</script>
